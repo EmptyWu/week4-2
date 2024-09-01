@@ -6,7 +6,7 @@ export interface BaseResponse{
 
 export interface SigninResponse extends BaseResponse{
     exp:number;
-    nickname:string;
+    nickname?:string;
     token:string;
 }
 

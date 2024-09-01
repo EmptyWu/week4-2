@@ -15,7 +15,7 @@ const router = useRouter();
 const token=document.cookie.match(/(?:^|;\s*)emptyTodo=([^;]*)/)?.[1];
 const todoList=ref<Todo[]>([]);
 const content=ref('');
-const signoutFn =async():res=>{
+const signoutFn =async():Promise<void>=>{
     try{
         const response:SinguoutResponseData=await axios.post(SignoutUrl,{},{
             headers: {Authorization: store.userData?.token}
@@ -32,7 +32,7 @@ const signoutFn =async():res=>{
     }
 };
 
-const AddTodos=async():res=>{
+const AddTodos=async():Promise<void>=>{
     try{
         await axios.post(TodosUrl,{
             content:content.value
@@ -53,7 +53,7 @@ const AddTodos=async():res=>{
     }
 };
 
-const checkOut =async():res=>{
+const checkOut =async():Promise<void>=>{
     try{
         const { data: responseData }: { data: SigninResponseData } = await axios.get(CheckoutUrl, {
             headers: { Authorization: token },
@@ -62,7 +62,7 @@ const checkOut =async():res=>{
         setToken({
             status :responseData.status,
             token :token,
-            nickname: responseData.nickname,
+            nickname: responseData?.nickname,
         });
     }catch(error:any){
         if (error.response) {
@@ -76,7 +76,7 @@ const checkOut =async():res=>{
     }
 };
 
-const getTodos=async():res=>{
+const getTodos=async():Promise<void>=>{
     try{
         const response:GetTodoResponseData=await axios.get(TodosUrl,{
             headers: {Authorization: token}
@@ -95,7 +95,7 @@ const getTodos=async():res=>{
     }
 };
 
-const toggle=async(id:string):res=>{
+const toggle=async(id:string):Promise<void>=>{
     try{
         await axios.patch(TodosToggleUrl(id),{},{
             headers: {Authorization: token}
@@ -110,7 +110,7 @@ const toggle=async(id:string):res=>{
     }
 };
 
-const delTodo=async(id:string):res=>{
+const delTodo=async(id:string):Promise<void>=>{
     try{
         await axios.delete(TodosPutDelUrl(id),{
             headers: {Authorization: token}

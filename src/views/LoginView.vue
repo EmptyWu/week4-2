@@ -2,7 +2,8 @@
 import {ref} from 'vue';
 import axios from 'axios';
 import { SigninUrl,SignupUrl } from '@/api/url/usersurl';
-import { Signin,res,SigninResponseData,MsgResponse,SingupRes } from '@/api/types/Signin';
+import { Signin,  MsgResponse, SingupRes } from '@/api/types/users';
+import type { res,SigninResponseData } from '@/api/types/users';
 import { usersStore } from '@/stores/usersStore';
 import {useRouter} from 'vue-router';
 
@@ -17,7 +18,7 @@ const SignPram =ref<Signin>({
     cofpwd:''
 });
 
-const signinFn =async():res=>{
+const signinFn =async():Promise<void>=>{
     isemail.value=false;
     if(SignPram.value.email ===""){
         isemail.value=true;
@@ -41,7 +42,7 @@ const signinFn =async():res=>{
     }
 
 };
-const signupFn= async ():res =>{
+const signupFn= async ():Promise<void> =>{
     try{
         isemail.value=false;
         if(SignPram.value.cofpwd==='' || SignPram.value.password !== SignPram.value.cofpwd){
@@ -72,7 +73,7 @@ const signupFn= async ():res =>{
     }
 };
 
-const reg=(status)=>{
+const reg=(status:boolean)=>{
     isLogin.value=status;
 };
 

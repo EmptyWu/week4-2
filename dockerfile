@@ -17,8 +17,13 @@ COPY package*.json ./
 
 RUN npm i && \
     npm i typescript@latest --save-dev && \
-    npm i gh-pages lucide-vue-next && \
+    npm i gh-pages && \
     npm i --save axios && \
+    npm i --save @fortawesome/fontawesome-svg-core && \
+    npm i --save @fortawesome/free-solid-svg-icons && \
+    npm i --save @fortawesome/free-regular-svg-icons && \
+    npm i --save @fortawesome/free-brands-svg-icons && \
+    npm i --save @fortawesome/vue-fontawesome@latest-3 && \
     npm i --save-dev sass
 
 COPY . .
