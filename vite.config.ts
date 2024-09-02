@@ -5,7 +5,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  base:'/week4-2/s',
+  base:'/week4-2/',
   plugins: [
     vue(),
   ],
