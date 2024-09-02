@@ -2,15 +2,25 @@
 import {ref,onMounted } from 'vue';
 import axios from 'axios';
 import { RouterLink, useRouter } from 'vue-router'
-import { usersStore } from '@/stores/usersStore';
+import { useTokenStore} from '@/stores/tokenStore';
 import {SignoutUrl,CheckoutUrl} from '@/api/url/usersurl';
-import { res,MsgResponse,SinguoutResponseData,SigninResponseData } from '@/api/types/users';
-import { GetTodoResponseData,Todo} from '@/api/types/todo';
+import type { MsgResponse,SinguoutResponseData,SigninResponseData } from '@/api/types/users';
+import type { Todo,GetTodoResponseData } from '@/api/types/todo';
 import { TodosUrl,TodosToggleUrl,TodosPutDelUrl } from '@/api/url/todosUrl';
 
 
-const store =usersStore();
-const {clearToken,setToken}=usersStore();
+const tokenStore =useTokenStore();
+
+interface userinterface {
+    status :boolean;    
+    nickname?:string;
+    token:string | undefined;
+};
+
+const userData=ref<userinterface|undefined>();
+
+const category=ref<string>('all');
+
 const router = useRouter();
 const token=document.cookie.match(/(?:^|;\s*)emptyTodo=([^;]*)/)?.[1];
 const todoList=ref<Todo[]>([]);
@@ -18,9 +28,11 @@ const content=ref('');
 const signoutFn =async():Promise<void>=>{
     try{
         const response:SinguoutResponseData=await axios.post(SignoutUrl,{},{
-            headers: {Authorization: store.userData?.token}
+            headers: {Authorization: token}
         });
-        clearToken();
+        tokenStore.clearToken();
+        //store.clearToken();
+        
         //console.log(response.data);
         router.push('/login');
     }catch(error:any){
@@ -55,15 +67,22 @@ const AddTodos=async():Promise<void>=>{
 
 const checkOut =async():Promise<void>=>{
     try{
-        const { data: responseData }: { data: SigninResponseData } = await axios.get(CheckoutUrl, {
+        console.log(token);
+        const response:SigninResponseData = await axios.get(CheckoutUrl, {
             headers: { Authorization: token },
         });
         //console.log(responseData);
-        setToken({
-            status :responseData.status,
+        tokenStore.setToken(token||'');
+        userData.value={
+            status :response.data.status,
             token :token,
-            nickname: responseData?.nickname,
-        });
+            nickname: response.data.nickname,
+        }
+        // store.setToken({
+        //     status :responseData.status,
+        //     token :token,
+        //     nickname: responseData?.nickname,
+        // });
     }catch(error:any){
         if (error.response) {
             const e=error.response.data as MsgResponse;
@@ -76,6 +95,11 @@ const checkOut =async():Promise<void>=>{
     }
 };
 
+const setCategory=(code:string)=>{
+    category.value=code;
+    getTodos();
+};
+
 const getTodos=async():Promise<void>=>{
     try{
         const response:GetTodoResponseData=await axios.get(TodosUrl,{
@@ -83,6 +107,17 @@ const getTodos=async():Promise<void>=>{
         });
         if(response.data.data.length >0){
             todoList.value=response.data.data;
+            switch(category.value){
+                case "all":
+                default:
+                    break;
+                case "not":
+                    todoList.value= todoList.value.filter((item) => !item.status);
+                    break;
+                case "finish":
+                    todoList.value= todoList.value.filter((item) => item.status);
+                    break;
+            }
            
         }else {
             
@@ -137,7 +172,7 @@ onMounted(()=>{
   <nav>
     <h1><a href="#">ONLINE TODO LIST</a></h1>
     <ul>
-      <li class="todo_sm"><a href="#"><span>{{store.userData?.nickname  }}的代辦</span></a></li>
+      <li class="todo_sm"><a href="#"><span>{{userData?.nickname  }}的代辦</span></a></li>
       <li><a @click="signoutFn">登出</a></li>
     </ul>
   </nav>
@@ -150,11 +185,11 @@ onMounted(()=>{
           
         </a>
       </div>
-      <div class="todoList_list">
+      <div class="todoList_list" v-if="todoList.length>0">
         <ul class="todoList_tab">
-          <li><a href="#" class="active">全部</a></li>
-          <li><a href="#">待完成</a></li>
-          <li><a href="#">已完成</a></li>
+          <li><a href="#" :class="{active:category==='all'}" @click="setCategory('all')">全部</a></li>
+          <li><a href="#" :class="{active:category==='not'}" @click="setCategory('not')">待完成</a></li>
+          <li><a href="#" :class="{active:category==='finish'}" @click="setCategory('finish')">已完成</a></li>
         </ul>
         <div class="todoList_items">
           <ul class="todoList_item">
@@ -174,6 +209,10 @@ onMounted(()=>{
             <p> {{ todoList.length }} 個已完成項目</p>
           </div>
         </div>
+      </div>
+      <div v-else>
+        <h5>目前尚無待辦事項</h5>
+        <img src="/empty.png" alt="empty">
       </div>
     </div>
   </div>

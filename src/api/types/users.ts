@@ -26,5 +26,6 @@ export interface Signin{
 }
 
 export type SigninResponseData=AxiosResponse<SigninResponse>;
+export type SingupResponseData=AxiosResponse<SingupRes>;
 export type SinguoutResponseData=AxiosResponse<MsgResponse>;
 export type res=AxiosResponse<void>;

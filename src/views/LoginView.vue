@@ -2,14 +2,15 @@
 import {ref} from 'vue';
 import axios from 'axios';
 import { SigninUrl,SignupUrl } from '@/api/url/usersurl';
-import { Signin,  MsgResponse, SingupRes } from '@/api/types/users';
-import type { res,SigninResponseData } from '@/api/types/users';
-import { usersStore } from '@/stores/usersStore';
+import type { SigninResponseData,SingupResponseData,Signin,  MsgResponse } from '@/api/types/users';
+//import { useUserStore } from '@/stores/usersStore';
+//import { useTokenStore } from '@/stores/tokenStore';
 import {useRouter} from 'vue-router';
 
 const isLogin=ref(false);
 const isemail=ref(false);
-const {setToken}=usersStore();
+//const store=useUserStore();
+//const tokenStore =useTokenStore();
 const router = useRouter();
 const SignPram =ref<Signin>({
     email:'',
@@ -30,8 +31,11 @@ const signinFn =async():Promise<void>=>{
             password: SignPram.value.password       
             });
         if(response.data.status){
-            setToken(response.data);
-            router.push('/');
+          //store.setToken(response.data);
+          const usedate=new Date();
+          usedate.setDate(usedate.getDate()+1);
+          document.cookie = `emptyTodo=${response.data.token}; expires=${usedate.toUTCString()}`;
+          router.push('/');
         }
     }
     catch(error:any){
@@ -49,16 +53,16 @@ const signupFn= async ():Promise<void> =>{
             throw new Error('密碼輸入有誤');
         }
         
-        const response:SingupRes= await axios.post(SignupUrl
+        const response:SingupResponseData= await axios.post(SignupUrl
             ,{
             email: SignPram.value.email,
             password: SignPram.value.password,
             nickname: SignPram.value.nickname
             });
-        console.log(response.data);
+        //console.log(response.data);
         if(response.data.status){
             alert('註冊成功');
-            router.push('/login#loginPage');
+            isLogin.value=!isLogin.value;
         }
     }
     catch(error:any){

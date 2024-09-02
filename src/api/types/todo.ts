@@ -1,5 +1,5 @@
 import type {AxiosResponse} from 'axios';
-import {BaseResponse, MsgResponse} from '@/api/types/users';
+import type { BaseResponse,MsgResponse } from '@/api/types/users';
 
 export interface Todo {
     id:string;

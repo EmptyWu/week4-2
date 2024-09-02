@@ -2,6 +2,11 @@ import './assets/all.scss'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPersistedstate from 'pinia-plugin-persistedstate';
+
+const pinia = createPinia();
+pinia.use(piniaPersistedstate);
+export default pinia;
 
 import App from './App.vue'
 import router from './router'
